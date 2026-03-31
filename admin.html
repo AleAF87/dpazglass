@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D'Paz Glass | Administração</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Archivo:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin-body">
+    <main class="admin-shell">
+        <section class="admin-login-card" id="loginCard">
+            <span class="section-tag">Admin</span>
+            <h1>Painel de projetos</h1>
+            <p>Faça login com Firebase Auth. Após a configuração, o painel pode gravar os links no Realtime Database e usar Cloudinary para hospedar as imagens.</p>
+            <div class="status-banner" id="configStatus"></div>
+            <form id="loginForm" class="admin-form">
+                <label>E-mail<input type="email" name="email" placeholder="admin@dpazglass.com" required></label>
+                <label>Senha<input type="password" name="password" placeholder="Sua senha" required></label>
+                <button class="btn btn-primary" type="submit">Entrar</button>
+            </form>
+            <button class="btn btn-secondary" id="demoModeBtn" type="button">Entrar em modo local</button>
+            <p class="admin-helper">O modo local serve para testar o fluxo antes de conectar Firebase e Cloudinary.</p>
+        </section>
+
+        <section class="admin-panel is-hidden" id="adminPanel">
+            <header class="admin-panel-header">
+                <div>
+                    <span class="section-tag">Gerenciamento</span>
+                    <h2>Projetos exibidos no site</h2>
+                    <p>Selecione um item da galeria, troque a imagem, recorte e salve.</p>
+                </div>
+                <div class="admin-actions">
+                    <button class="btn btn-secondary" id="newProjectBtn" type="button">Novo projeto</button>
+                    <button class="btn btn-secondary" id="logoutBtn" type="button">Sair</button>
+                </div>
+            </header>
+
+            <div class="admin-layout">
+                <aside class="admin-list-panel">
+                    <div class="admin-list-header">
+                        <h3>Projetos cadastrados</h3>
+                        <span id="projectCount">0 itens</span>
+                    </div>
+                    <div class="admin-project-list" id="projectList"></div>
+                </aside>
+
+                <section class="admin-editor-panel">
+                    <form class="admin-form" id="projectForm">
+                        <input type="hidden" name="id">
+                        <label>Título<input type="text" name="title" placeholder="Ex.: Box Elegance" required></label>
+                        <label>Local<input type="text" name="location" placeholder="Ex.: Maringá - PR" required></label>
+                        <label>Categoria<select name="category" required><option value="box">Box</option><option value="fachada">Fachada</option><option value="espelho">Espelho</option><option value="divisoria">Divisória</option></select></label>
+                        <label>Descrição curta<textarea name="description" rows="3" placeholder="Resumo do projeto" required></textarea></label>
+                        <label>URL da imagem<input type="url" name="imageUrl" placeholder="https://..."></label>
+                        <label>Ordem de exibição<input type="number" name="order" min="1" value="1" required></label>
+                        <label class="checkbox-line"><input type="checkbox" name="featured">Destacar este projeto</label>
+
+                        <div class="uploader-block">
+                            <div class="uploader-header">
+                                <h3>Trocar imagem com enquadramento</h3>
+                                <p>Selecione um arquivo, ajuste o recorte e envie. Quando o Cloudinary estiver configurado, o upload pode ser feito diretamente por aqui.</p>
+                            </div>
+                            <label>Escolher imagem<input type="file" id="imageFileInput" accept="image/*"></label>
+                            <div class="cropper-toolbar">
+                                <button class="btn btn-secondary" id="ratioLandscapeBtn" type="button">Paisagem 4:3</button>
+                                <button class="btn btn-secondary" id="ratioSquareBtn" type="button">Quadrado 1:1</button>
+                                <button class="btn btn-secondary" id="zoomInBtn" type="button">Zoom +</button>
+                                <button class="btn btn-secondary" id="zoomOutBtn" type="button">Zoom -</button>
+                            </div>
+                            <div class="cropper-stage"><img id="cropperImage" alt="Prévia para recorte"></div>
+                            <div class="preview-card">
+                                <span>Prévia do card</span>
+                                <div class="preview-frame"><img id="previewImage" alt="Prévia final"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn btn-primary" type="submit">Salvar projeto</button>
+                            <button class="btn btn-secondary" id="deleteProjectBtn" type="button">Excluir</button>
+                        </div>
+
+                        <div class="status-banner" id="adminStatus"></div>
+                    </form>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+    <script type="module" src="js/admin.js"></script>
+</body>
+</html>
