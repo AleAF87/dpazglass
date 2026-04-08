@@ -7,17 +7,20 @@ export async function loadNavbar() {
 
     const menuToggle = document.getElementById('menuToggle');
     const siteNav = document.getElementById('siteNav');
+    const headerMenu = document.querySelector('.header-menu');
     const siteHeader = document.getElementById('siteHeader');
     const navLinks = [...document.querySelectorAll('[data-scroll]')];
 
     function closeMenu() {
-        siteNav.classList.remove('is-open');
+        siteNav?.classList.remove('is-open');
+        headerMenu?.classList.remove('is-open');
         menuToggle?.setAttribute('aria-expanded', 'false');
     }
 
     menuToggle?.addEventListener('click', () => {
-        const nextState = !siteNav.classList.contains('is-open');
-        siteNav.classList.toggle('is-open', nextState);
+        const nextState = !headerMenu?.classList.contains('is-open');
+        headerMenu?.classList.toggle('is-open', nextState);
+        siteNav?.classList.toggle('is-open', nextState);
         menuToggle.setAttribute('aria-expanded', String(nextState));
     });
 
@@ -35,7 +38,7 @@ export async function loadNavbar() {
         siteHeader?.classList.toggle('is-scrolled', window.scrollY > 24);
     });
 
-    const sections = [...document.querySelectorAll('main section[id]')];
+    const sections = [...document.querySelectorAll('section[id]')];
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (!entry.isIntersecting) return;

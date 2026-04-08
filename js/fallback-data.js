@@ -13,10 +13,10 @@ export const HERO_METRICS = [
 ];
 
 export const SERVICES = [
-    { title: 'Boxes de vidro', description: 'Soluções funcionais e sofisticadas para banheiros com ferragens e acabamento alinhados ao projeto.' },
-    { title: 'Fachadas e portas', description: 'Aplicações para frentes comerciais e acessos com transparência, presença e melhor percepção de valor.' },
-    { title: 'Espelhos e painéis', description: 'Instalações que ampliam visualmente o ambiente e ajudam a compor interiores contemporâneos.' },
-    { title: 'Divisórias e fechamento', description: 'Separação de ambientes com leveza estética e aproveitamento inteligente da iluminação.' }
+    { title: 'Boxes de vidro', description: 'Soluções funcionais e sofisticadas para banheiros com ferragens e acabamento alinhados ao projeto.', imageUrl: 'img/projetos/projeto-01.svg' },
+    { title: 'Fachadas e portas', description: 'Aplicações para frentes comerciais e acessos com transparência, presença e melhor percepção de valor.', imageUrl: 'img/projetos/projeto-02.svg' },
+    { title: 'Espelhos e painéis', description: 'Instalações que ampliam visualmente o ambiente e ajudam a compor interiores contemporâneos.', imageUrl: 'img/projetos/projeto-03.svg' },
+    { title: 'Divisórias e fechamento', description: 'Separação de ambientes com leveza estética e aproveitamento inteligente da iluminação.', imageUrl: 'img/projetos/projeto-04.svg' }
 ];
 
 export const TESTIMONIALS = [

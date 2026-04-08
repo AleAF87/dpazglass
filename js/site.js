@@ -1,25 +1,25 @@
-import { COMPANY_INFO, HERO_METRICS, SERVICES, TESTIMONIALS } from './fallback-data.js';
+import { COMPANY_INFO, SERVICES } from './fallback-data.js';
 import { getProjects } from './project-store.js';
 import { loadNavbar } from './navbar.js';
 
 const projectsGrid = document.getElementById('projectsGrid');
-const heroMetrics = document.getElementById('heroMetrics');
 const servicesGrid = document.getElementById('servicesGrid');
-const testimonialGrid = document.getElementById('testimonialGrid');
 const contactList = document.getElementById('contactList');
 const contactForm = document.getElementById('contactForm');
 let allProjects = [];
 
-function renderHeroMetrics() {
-    heroMetrics.innerHTML = HERO_METRICS.map((metric) => `<li><strong>${metric.value}</strong><span>${metric.label}</span></li>`).join('');
-}
-
 function renderServices() {
-    servicesGrid.innerHTML = SERVICES.map((service) => `<article class="service-card"><h3>${service.title}</h3><p>${service.description}</p></article>`).join('');
-}
-
-function renderTestimonials() {
-    testimonialGrid.innerHTML = TESTIMONIALS.map((item) => `<article class="testimonial-card"><h3>${item.title}</h3><p>${item.text}</p></article>`).join('');
+    servicesGrid.innerHTML = SERVICES.map((service, index) => `
+        <article class="product-card">
+            <figure>
+                <img src="${service.imageUrl || `img/projetos/projeto-0${(index % 4) + 1}.svg`}" alt="${service.title}" loading="lazy">
+            </figure>
+            <div class="product-card-text">
+                <h3>${service.title}</h3>
+                <p>${service.description}</p>
+            </div>
+        </article>
+    `).join('');
 }
 
 function renderContact() {
@@ -35,10 +35,10 @@ function renderProjects(filter = 'todos') {
     const filtered = filter === 'todos' ? allProjects : allProjects.filter((project) => project.category === filter);
     projectsGrid.innerHTML = filtered.map((project) => `
         <article class="project-card ${project.featured ? 'is-featured' : ''}">
-            <div class="project-image-wrap"><img src="${project.imageUrl}" alt="${project.title}" loading="lazy"></div>
+            <figure class="project-image-wrap"><img src="${project.imageUrl}" alt="${project.title}" loading="lazy"></figure>
             <div class="project-content">
-                <div class="project-meta"><span>${project.category}</span><small>${project.location}</small></div>
                 <h3>${project.title}</h3>
+                <span>${project.location}</span>
                 <p>${project.description}</p>
             </div>
         </article>
@@ -70,16 +70,70 @@ function setupContactForm() {
     });
 }
 
+function setupBannerSlider() {
+    const slides = [...document.querySelectorAll('.banner-slide')];
+    const dotsRoot = document.getElementById('bannerDots');
+    const prevButton = document.getElementById('bannerPrev');
+    const nextButton = document.getElementById('bannerNext');
+    let currentIndex = 0;
+    let timerId = null;
+
+    if (!slides.length || !dotsRoot) return;
+
+    slides.forEach((slide) => {
+        slide.style.backgroundImage = `url("${slide.dataset.bg}")`;
+    });
+
+    dotsRoot.innerHTML = slides.map((_, index) => `<button type="button" aria-label="Ir para banner ${index + 1}"></button>`).join('');
+    const dots = [...dotsRoot.querySelectorAll('button')];
+
+    function showSlide(index) {
+        currentIndex = (index + slides.length) % slides.length;
+        slides.forEach((slide, slideIndex) => slide.classList.toggle('is-active', slideIndex === currentIndex));
+        dots.forEach((dot, dotIndex) => dot.classList.toggle('is-active', dotIndex === currentIndex));
+    }
+
+    function startAutoPlay() {
+        clearInterval(timerId);
+        timerId = setInterval(() => showSlide(currentIndex + 1), 6500);
+    }
+
+    dots.forEach((dot, index) => dot.addEventListener('click', () => {
+        showSlide(index);
+        startAutoPlay();
+    }));
+
+    prevButton?.addEventListener('click', () => {
+        showSlide(currentIndex - 1);
+        startAutoPlay();
+    });
+
+    nextButton?.addEventListener('click', () => {
+        showSlide(currentIndex + 1);
+        startAutoPlay();
+    });
+
+    showSlide(0);
+    startAutoPlay();
+}
+
+function setupContactFocus() {
+    document.getElementById('openContactFocus')?.addEventListener('click', () => {
+        document.querySelector('#contato')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => contactForm?.elements.nome?.focus(), 500);
+    });
+}
+
 async function init() {
     await loadNavbar();
-    renderHeroMetrics();
+    setupBannerSlider();
     renderServices();
-    renderTestimonials();
     renderContact();
     allProjects = await getProjects();
     renderProjects();
     setupFilters();
     setupContactForm();
+    setupContactFocus();
     document.getElementById('currentYear').textContent = new Date().getFullYear();
 }
 
