@@ -1,14 +1,14 @@
 :root {
-    --blue: #008aff;
-    --blue-dark: #004d80;
-    --blue-deep: #063c62;
-    --blue-soft: #eaf6ff;
-    --text: #203140;
-    --muted: #667889;
-    --line: #e2ebf2;
-    --light: #f6f9fc;
+    --blue: #d4af37;
+    --blue-dark: #4a4f55;
+    --blue-deep: #26292d;
+    --blue-soft: #f6efcf;
+    --text: #2f3439;
+    --muted: #686f75;
+    --line: #ddd8ca;
+    --light: #f5f3ee;
     --white: #ffffff;
-    --shadow: 0 18px 45px rgba(0, 68, 117, 0.13);
+    --shadow: 0 18px 45px rgba(38, 41, 45, 0.16);
     --content-width: min(1180px, calc(100% - 32px));
 }
 
@@ -24,8 +24,8 @@ code { color: var(--blue-dark); background: var(--blue-soft); padding: 2px 6px; 
     position: fixed;
     inset: 0 0 auto;
     z-index: 50;
-    background: var(--white);
-    box-shadow: 0 10px 32px rgba(6, 60, 98, 0.08);
+    background: var(--blue-deep);
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.24);
 }
 
 .header-topbar-container {
@@ -43,20 +43,13 @@ code { color: var(--blue-dark); background: var(--blue-soft); padding: 2px 6px; 
 
 .header-logo {
     display: inline-flex;
-    align-items: baseline;
-    gap: 8px;
-    font-size: 2.05rem;
-    font-weight: 800;
-    letter-spacing: -0.05em;
-    color: var(--blue);
+    align-items: center;
 }
 
-.header-logo-mark {
-    color: var(--blue-dark);
-}
-
-.header-logo strong {
-    color: var(--blue);
+.header-logo img {
+    height: 60px;
+    width: auto;
+    object-fit: contain;
 }
 
 .header-menu {
@@ -69,7 +62,7 @@ code { color: var(--blue-dark); background: var(--blue-soft); padding: 2px 6px; 
     justify-content: flex-end;
     align-items: center;
     gap: 20px;
-    color: var(--muted);
+    color: rgba(255, 255, 255, 0.72);
     font-size: 0.86rem;
 }
 
@@ -86,7 +79,7 @@ code { color: var(--blue-dark); background: var(--blue-soft); padding: 2px 6px; 
 
 .header-contact-list a,
 .header-network-list a {
-    color: var(--blue-dark);
+    color: var(--blue);
     font-weight: 600;
 }
 
@@ -100,7 +93,7 @@ code { color: var(--blue-dark); background: var(--blue-soft); padding: 2px 6px; 
 .site-nav a {
     display: inline-flex;
     padding: 12px 15px;
-    color: var(--blue-deep);
+    color: rgba(255, 255, 255, 0.9);
     font-weight: 700;
     text-transform: uppercase;
     font-size: 0.86rem;
@@ -111,7 +104,7 @@ code { color: var(--blue-dark); background: var(--blue-soft); padding: 2px 6px; 
 
 .site-nav a:hover,
 .site-nav a.is-active {
-    color: var(--white);
+    color: var(--blue-deep);
     background: var(--blue);
 }
 
@@ -120,7 +113,7 @@ code { color: var(--blue-dark); background: var(--blue-soft); padding: 2px 6px; 
     width: 46px;
     height: 42px;
     border: 0;
-    background: var(--blue);
+    background: var(--blue-dark);
     border-radius: 8px;
     cursor: pointer;
 }
@@ -162,7 +155,7 @@ code { color: var(--blue-dark); background: var(--blue-soft); padding: 2px 6px; 
 .banner-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, rgba(0, 55, 94, 0.86) 0%, rgba(0, 95, 165, 0.58) 44%, rgba(0, 138, 255, 0.16) 100%);
+    background: linear-gradient(90deg, rgba(38, 41, 45, 0.9) 0%, rgba(74, 79, 85, 0.72) 44%, rgba(212, 175, 55, 0.22) 100%);
 }
 
 .banner-content {
@@ -177,7 +170,7 @@ code { color: var(--blue-dark); background: var(--blue-soft); padding: 2px 6px; 
 .banner-content span {
     display: inline-flex;
     margin-bottom: 14px;
-    color: #bfe7ff;
+    color: #f3de95;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -228,9 +221,9 @@ code { color: var(--blue-dark); background: var(--blue-soft); padding: 2px 6px; 
 }
 
 .btn-primary {
-    color: var(--white);
+    color: var(--blue-deep);
     background: var(--blue);
-    box-shadow: 0 12px 28px rgba(0, 138, 255, 0.28);
+    box-shadow: 0 12px 28px rgba(212, 175, 55, 0.28);
 }
 
 .btn-secondary {
@@ -678,7 +671,8 @@ code { color: var(--blue-dark); background: var(--blue-soft); padding: 2px 6px; 
 
 @media (max-width: 1120px) {
     .header-topbar-row { grid-template-columns: 1fr auto; min-height: 82px; }
-    .header-menu { position: absolute; top: 82px; left: 0; right: 0; display: none; padding: 20px 16px; background: var(--white); box-shadow: var(--shadow); }
+    .header-logo img { height: 48px; }
+    .header-menu { position: absolute; top: 82px; left: 0; right: 0; display: none; padding: 20px 16px; background: var(--blue-deep); box-shadow: var(--shadow); }
     .header-menu.is-open { display: grid; }
     .header-social-row, .site-nav, .header-contact-list, .header-network-list { justify-content: flex-start; }
     .site-nav { flex-direction: column; align-items: stretch; }
