@@ -1,9 +1,9 @@
 export const COMPANY_INFO = {
-    whatsapp: '5544999999999',
-    phone: '(44) 99999-9999',
+    whatsapp: '5516991470086',
+    phone: '(16) 99147-0086',
     email: 'contato@dpazglass.com.br',
     instagram: '@dpazglass',
-    city: 'Maringá - PR'
+    city: 'Ribeirão Preto / SP'
 };
 
 export const HERO_METRICS = [
@@ -12,11 +12,27 @@ export const HERO_METRICS = [
     { value: 'Atendimento ágil', label: 'Contato fácil e proposta objetiva' }
 ];
 
+const PROJECT_SECTIONS = [
+    'Box Elegance com roldanas aparente',
+    'Box linha tradicional padrão',
+    'Box Mini Max design minimalista',
+    'Box Tradicional padrão vidro verde',
+    'Fachada em vidro “Pele de Vidro” conjugado com vitro Maxiar e porta em alumínio Esquadria linha Gold Black',
+    'Guarda corpo e fachada em vidro',
+    'Porta em alumínio para ambientes internos',
+    'Porta em Esquadria Alumínio Madeirado linha Gold',
+    'Vitro Basculante linha Vidro Temperado'
+];
+
+function slugifyProjectSection(value) {
+    return value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
 export const SERVICES = [
-    { title: 'Boxes de vidro', description: 'Soluções funcionais e sofisticadas para banheiros com ferragens e acabamento alinhados ao projeto.', imageUrl: 'img/projetos/projeto-01.svg' },
-    { title: 'Fachadas e portas', description: 'Aplicações para frentes comerciais e acessos com transparência, presença e melhor percepção de valor.', imageUrl: 'img/projetos/projeto-02.svg' },
-    { title: 'Espelhos e painéis', description: 'Instalações que ampliam visualmente o ambiente e ajudam a compor interiores contemporâneos.', imageUrl: 'img/projetos/projeto-03.svg' },
-    { title: 'Divisórias e fechamento', description: 'Separação de ambientes com leveza estética e aproveitamento inteligente da iluminação.', imageUrl: 'img/projetos/projeto-04.svg' }
+    { title: 'Boxes de vidro', description: 'Soluções funcionais e sofisticadas para banheiros com ferragens e acabamento alinhados ao projeto.', imageUrl: 'img/projetos/Box Elegance com roldanas aparente - 01.jpeg' },
+    { title: 'Fachadas e portas', description: 'Aplicações para frentes comerciais e acessos com transparência, presença e melhor percepção de valor.', imageUrl: 'img/projetos/Fachada em vidro “Pele de Vidro” conjugado com vitro Maxiar e porta em alumínio Esquadria linha Gold Black - 01.jpeg' },
+    { title: 'Guarda-corpos', description: 'Instalações em vidro que protegem, integram o visual e mantêm a leveza do ambiente.', imageUrl: 'img/projetos/Guarda corpo e fachada em vidro - 01.jpeg' },
+    { title: 'Portas e esquadrias', description: 'Portas em alumínio e vidro para ambientes internos, fachadas e projetos sob medida.', imageUrl: 'img/projetos/Porta em Esquadria Alumínio Madeirado linha Gold - 01.jpeg' }
 ];
 
 export const TESTIMONIALS = [
@@ -25,45 +41,14 @@ export const TESTIMONIALS = [
     { title: 'Estrutura pronta para crescer', text: 'A base suporta integração com Firebase, Cloudinary, GitHub e deploy simples no Netlify.' }
 ];
 
-export const FALLBACK_PROJECTS = [
-    {
-        id: 'projeto-01',
-        title: 'Box Elegance',
-        location: 'Maringá - PR',
-        category: 'box',
-        description: 'Box com composição clean e ferragens discretas para banheiro contemporâneo.',
-        imageUrl: 'img/projetos/projeto-01.svg',
-        featured: true,
-        order: 1
-    },
-    {
-        id: 'projeto-02',
-        title: 'Fachada Prime',
-        location: 'Paiçandu - PR',
-        category: 'fachada',
-        description: 'Frente comercial com painéis de vidro valorizando a entrada e a iluminação.',
-        imageUrl: 'img/projetos/projeto-02.svg',
-        featured: false,
-        order: 2
-    },
-    {
-        id: 'projeto-03',
-        title: 'Espelho Soft Line',
-        location: 'Sarandi - PR',
-        category: 'espelho',
-        description: 'Espelho sob medida para ampliar o ambiente e reforçar a elegância do espaço.',
-        imageUrl: 'img/projetos/projeto-03.svg',
-        featured: false,
-        order: 3
-    },
-    {
-        id: 'projeto-04',
-        title: 'Divisória Office',
-        location: 'Maringá - PR',
-        category: 'divisoria',
-        description: 'Divisória de vidro para escritório com leitura visual limpa e contemporânea.',
-        imageUrl: 'img/projetos/projeto-04.svg',
-        featured: true,
-        order: 4
-    }
-];
+export const FALLBACK_PROJECTS = PROJECT_SECTIONS.map((title, index) => ({
+    id: `${slugifyProjectSection(title)}-01`,
+    title,
+    location: '',
+    category: slugifyProjectSection(title),
+    categoryLabel: title,
+    description: 'Projeto executado sob medida com acabamento profissional em vidro e alumínio.',
+    imageUrl: `img/projetos/${title} - 01.jpeg`,
+    featured: index === 0 || index === 4,
+    order: index + 1
+}));

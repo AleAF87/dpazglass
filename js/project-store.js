@@ -5,13 +5,28 @@ const STORAGE_KEY = 'dpazglass.projects';
 const DB_PATH = 'siteContent/projects';
 
 function normalizeProject(project, index = 0) {
+    const oldProjectMatch = String(project.id || '').match(/^projeto-0([1-4])$/);
+    const fallbackIndex = oldProjectMatch ? Number(oldProjectMatch[1]) - 1 : index;
+    const fallback = FALLBACK_PROJECTS[fallbackIndex % FALLBACK_PROJECTS.length];
+    const usesRemovedSvg = /img\/projetos\/projeto-0[1-4]\.svg$/.test(project.imageUrl || '');
+    const location = ['D\'Paz Glass', 'Projeto sob medida'].includes(project.location) ? '' : project.location;
+
+    if (usesRemovedSvg && oldProjectMatch) {
+        return {
+            ...fallback,
+            featured: Boolean(project.featured || fallback.featured),
+            order: Number(project.order || fallback.order)
+        };
+    }
+
     return {
         id: project.id || `projeto-${Date.now()}-${index}`,
         title: project.title || 'Projeto sem título',
-        location: project.location || 'Local não informado',
+        location: location || '',
         category: project.category || 'box',
+        categoryLabel: project.categoryLabel || project.title || project.category || 'Projeto',
         description: project.description || '',
-        imageUrl: project.imageUrl || FALLBACK_PROJECTS[index % FALLBACK_PROJECTS.length].imageUrl,
+        imageUrl: project.imageUrl || fallback.imageUrl,
         featured: Boolean(project.featured),
         order: Number(project.order || index + 1)
     };
