@@ -44,7 +44,15 @@ function getLocalProjects() {
     }
 
     try {
-        return sortProjects(JSON.parse(raw).map(normalizeProject));
+        const storedProjects = JSON.parse(raw);
+        const hasLegacyProjects = storedProjects.some((project) => /^(Box |Fachada |Guarda |Porta |Vitro )/.test(project.title || ''));
+
+        if (hasLegacyProjects) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(FALLBACK_PROJECTS));
+            return FALLBACK_PROJECTS;
+        }
+
+        return sortProjects(storedProjects.map(normalizeProject));
     } catch (error) {
         console.error('Falha ao ler projetos locais:', error);
         return FALLBACK_PROJECTS;

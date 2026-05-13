@@ -9,6 +9,37 @@ const contactForm = document.getElementById('contactForm');
 const projectsToolbar = document.querySelector('.projects-toolbar');
 let allProjects = [];
 
+const SERVICE_GALLERIES = {
+    'Janelas': [
+        'img/projetos/janelas/Vitro Basculante linha Vidro Temperado.jpeg'
+    ],
+    'Fachadas': [
+        'img/projetos/fachadas_portas/Fachada em vidro “Pele de Vidro” conjugado com vitro Maxiar e porta em alumínio Esquadria linha Gold Black.jpeg'
+    ],
+    'Guarda-corpos': [
+        'img/projetos/guarda_corpos/Guarda corpo e fachada em vidro.jpeg'
+    ],
+    'Portas e esquadrias': [
+        'img/projetos/portas_esquadrias/Porta em alumínio para ambientes internos.jpeg',
+        'img/projetos/portas_esquadrias/Porta em Esquadria Alumínio Madeirado linha Gold.jpeg'
+    ]
+};
+
+const PROJECT_GALLERIES = {
+    'Elegance com roldanas aparente': [
+        'img/projetos/boxes_vidro/elegance_roldanas_aparente/Box Elegance com roldanas aparente.jpeg'
+    ],
+    'Mini Max design minimalista': [
+        'img/projetos/boxes_vidro/mini_max_minimalista/Box Mini Max design minimalista.jpeg'
+    ],
+    'Tradicional padrão': [
+        'img/projetos/boxes_vidro/tradicional_padrão/Box linha tradicional padrão.jpeg'
+    ],
+    'Tradicional vidro verde': [
+        'img/projetos/boxes_vidro/tradicional_vidro_verde/Box Tradicional padrão vidro verde.jpeg'
+    ]
+};
+
 function escapeAttribute(value = '') {
     return String(value)
         .replace(/&/g, '&amp;')
@@ -17,29 +48,52 @@ function escapeAttribute(value = '') {
         .replace(/>/g, '&gt;');
 }
 
-function getImageButton(imageUrl, altText, extraClass = '') {
+function getFileLabel(imageUrl = '') {
+    const fileName = decodeURIComponent(String(imageUrl).split('/').pop() || '').replace(/\.[^.]+$/, '');
+    return fileName || 'Imagem do projeto';
+}
+
+function createGalleryItems(paths = [], fallbackTitle = '') {
+    return paths.filter(Boolean).map((src) => ({
+        src,
+        title: getFileLabel(src) || fallbackTitle
+    }));
+}
+
+function getRandomGalleryItem(galleryItems = []) {
+    if (!galleryItems.length) return null;
+    return galleryItems[Math.floor(Math.random() * galleryItems.length)];
+}
+
+function getImageButton(imageUrl, altText, extraClass = '', galleryItems = []) {
     const safeImageUrl = escapeAttribute(imageUrl);
     const safeAltText = escapeAttribute(altText);
+    const safeGallery = escapeAttribute(JSON.stringify(galleryItems.length ? galleryItems : [{ src: imageUrl, title: altText }]));
 
     return `
-        <button class="image-lightbox-trigger ${extraClass}" type="button" data-full-image="${safeImageUrl}" data-image-alt="${safeAltText}">
+        <button class="image-lightbox-trigger ${extraClass}" type="button" data-full-image="${safeImageUrl}" data-image-alt="${safeAltText}" data-gallery="${safeGallery}">
             <img src="${safeImageUrl}" alt="${safeAltText}" loading="lazy">
         </button>
     `;
 }
 
 function renderServices() {
-    servicesGrid.innerHTML = SERVICES.map((service, index) => `
-        <article class="product-card">
-            <figure>
-                ${getImageButton(service.imageUrl || 'img/projetos/Box Elegance com roldanas aparente - 01.jpeg', service.title)}
-            </figure>
-            <div class="product-card-text">
-                <h3>${service.title}</h3>
-                <p>${service.description}</p>
-            </div>
-        </article>
-    `).join('');
+    servicesGrid.innerHTML = SERVICES.map((service) => {
+        const galleryItems = createGalleryItems(SERVICE_GALLERIES[service.title] || [service.imageUrl], service.title);
+        const featuredImage = getRandomGalleryItem(galleryItems) || { src: service.imageUrl, title: service.title };
+
+        return `
+            <article class="product-card">
+                <figure>
+                    ${getImageButton(featuredImage.src, service.title, '', galleryItems)}
+                </figure>
+                <div class="product-card-text">
+                    <h3>${service.title}</h3>
+                    <p>${service.description}</p>
+                </div>
+            </article>
+        `;
+    }).join('');
 }
 
 function renderContact() {
@@ -53,16 +107,21 @@ function renderContact() {
 
 function renderProjects(filter = 'todos') {
     const filtered = filter === 'todos' ? allProjects : allProjects.filter((project) => project.category === filter);
-    projectsGrid.innerHTML = filtered.map((project) => `
-        <article class="project-card ${project.featured ? 'is-featured' : ''}">
-            <figure class="project-image-wrap">${getImageButton(project.imageUrl, project.title)}</figure>
-            <div class="project-content">
-                <h3>${project.title}</h3>
-                ${project.location ? `<span>${project.location}</span>` : ''}
-                <p>${project.description}</p>
-            </div>
-        </article>
-    `).join('');
+    projectsGrid.innerHTML = filtered.map((project) => {
+        const galleryItems = createGalleryItems(PROJECT_GALLERIES[project.title] || [project.imageUrl], project.title);
+        const featuredImage = getRandomGalleryItem(galleryItems) || { src: project.imageUrl, title: project.title };
+
+        return `
+            <article class="project-card ${project.featured ? 'is-featured' : ''}">
+                <figure class="project-image-wrap">${getImageButton(featuredImage.src, project.title, '', galleryItems)}</figure>
+                <div class="project-content">
+                    <h3>${project.title}</h3>
+                    ${project.location ? `<span>${project.location}</span>` : ''}
+                    <p>${project.description}</p>
+                </div>
+            </article>
+        `;
+    }).join('');
 }
 
 function setupFilters() {
@@ -97,7 +156,6 @@ function setupContactForm() {
         const text = [
             'Olá, vim pelo site da D\'Paz Glass.',
             `Nome: ${formData.get('nome')}`,
-            `Telefone: ${formData.get('telefone')}`,
             `Tipo de projeto: ${formData.get('tipo')}`,
             `Mensagem: ${formData.get('mensagem') || 'Não informada'}`
         ].join('\n');
@@ -166,17 +224,65 @@ function setupImageLightbox() {
     modal.innerHTML = `
         <div class="image-lightbox-dialog" role="dialog" aria-modal="true" aria-label="Imagem ampliada">
             <button class="image-lightbox-close" type="button" aria-label="Fechar imagem">×</button>
-            <img src="" alt="">
+            <button class="image-lightbox-nav image-lightbox-prev" type="button" aria-label="Imagem anterior">‹</button>
+            <figure class="image-lightbox-stage">
+                <img src="" alt="">
+                <figcaption></figcaption>
+            </figure>
+            <button class="image-lightbox-nav image-lightbox-next" type="button" aria-label="Próxima imagem">›</button>
+            <div class="image-lightbox-thumbs" aria-label="Miniaturas da galeria"></div>
         </div>
     `;
     document.body.appendChild(modal);
 
     const modalImage = modal.querySelector('img');
+    const modalCaption = modal.querySelector('figcaption');
+    const thumbsRoot = modal.querySelector('.image-lightbox-thumbs');
     const closeButton = modal.querySelector('.image-lightbox-close');
+    const prevButton = modal.querySelector('.image-lightbox-prev');
+    const nextButton = modal.querySelector('.image-lightbox-next');
+    let currentGallery = [];
+    let currentIndex = 0;
 
-    function openLightbox(imageUrl, altText) {
-        modalImage.src = imageUrl;
-        modalImage.alt = altText || 'Imagem ampliada';
+    function parseGallery(trigger, imageUrl, altText) {
+        try {
+            const parsed = JSON.parse(trigger.dataset.gallery || '[]');
+            if (Array.isArray(parsed) && parsed.length) {
+                return parsed;
+            }
+        } catch (error) {
+            console.error('Falha ao abrir galeria:', error);
+        }
+
+        return [{ src: imageUrl, title: altText || getFileLabel(imageUrl) }];
+    }
+
+    function renderLightboxImage() {
+        const item = currentGallery[currentIndex];
+        if (!item) return;
+
+        modalImage.src = item.src;
+        modalImage.alt = item.title || 'Imagem ampliada';
+        modalCaption.textContent = item.title || getFileLabel(item.src);
+        prevButton.hidden = currentGallery.length < 2;
+        nextButton.hidden = currentGallery.length < 2;
+        thumbsRoot.hidden = currentGallery.length < 2;
+        thumbsRoot.innerHTML = currentGallery.map((galleryItem, index) => `
+            <button class="${index === currentIndex ? 'is-active' : ''}" type="button" aria-label="Ver ${escapeAttribute(galleryItem.title || `imagem ${index + 1}`)}" data-gallery-index="${index}">
+                <img src="${escapeAttribute(galleryItem.src)}" alt="${escapeAttribute(galleryItem.title || '')}">
+            </button>
+        `).join('');
+    }
+
+    function showLightboxItem(index) {
+        currentIndex = (index + currentGallery.length) % currentGallery.length;
+        renderLightboxImage();
+    }
+
+    function openLightbox(galleryItems, imageUrl) {
+        currentGallery = galleryItems;
+        currentIndex = Math.max(0, galleryItems.findIndex((item) => item.src === imageUrl));
+        renderLightboxImage();
         modal.classList.add('is-open');
         modal.setAttribute('aria-hidden', 'false');
         document.body.classList.add('has-open-lightbox');
@@ -188,6 +294,8 @@ function setupImageLightbox() {
         modal.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('has-open-lightbox');
         modalImage.removeAttribute('src');
+        currentGallery = [];
+        currentIndex = 0;
     }
 
     document.addEventListener('click', (event) => {
@@ -198,10 +306,18 @@ function setupImageLightbox() {
         const imageUrl = trigger.dataset.fullImage || image?.currentSrc || image?.src;
         if (!imageUrl) return;
 
-        openLightbox(imageUrl, trigger.dataset.imageAlt || image?.alt);
+        openLightbox(parseGallery(trigger, imageUrl, trigger.dataset.imageAlt || image?.alt), imageUrl);
     });
 
     closeButton.addEventListener('click', closeLightbox);
+    prevButton.addEventListener('click', () => showLightboxItem(currentIndex - 1));
+    nextButton.addEventListener('click', () => showLightboxItem(currentIndex + 1));
+
+    thumbsRoot.addEventListener('click', (event) => {
+        const thumb = event.target.closest('button[data-gallery-index]');
+        if (!thumb) return;
+        showLightboxItem(Number(thumb.dataset.galleryIndex));
+    });
 
     modal.addEventListener('click', (event) => {
         if (event.target === modal) {
@@ -212,6 +328,12 @@ function setupImageLightbox() {
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && modal.classList.contains('is-open')) {
             closeLightbox();
+        }
+        if (event.key === 'ArrowLeft' && modal.classList.contains('is-open') && currentGallery.length > 1) {
+            showLightboxItem(currentIndex - 1);
+        }
+        if (event.key === 'ArrowRight' && modal.classList.contains('is-open') && currentGallery.length > 1) {
+            showLightboxItem(currentIndex + 1);
         }
     });
 }
