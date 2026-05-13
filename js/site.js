@@ -40,6 +40,30 @@ const PROJECT_GALLERIES = {
     ]
 };
 
+const BOX_PROJECT_GALLERY = Object.values(PROJECT_GALLERIES).flat();
+const PROJECT_GALLERY_ALIASES = [
+    {
+        patterns: ['elegance-com-roldanas-aparente'],
+        paths: PROJECT_GALLERIES['Elegance com roldanas aparente']
+    },
+    {
+        patterns: ['mini-max-design-minimalista'],
+        paths: PROJECT_GALLERIES['Mini Max design minimalista']
+    },
+    {
+        patterns: ['tradicional-padrao', 'linha-tradicional-padrao'],
+        paths: [
+            'img/projetos/boxes_vidro/tradicional_padrão/Box linha tradicional padrão.jpeg'
+        ]
+    },
+    {
+        patterns: ['tradicional-vidro-verde'],
+        paths: [
+            'img/projetos/boxes_vidro/tradicional_vidro_verde/Box Tradicional padrão vidro verde.jpeg'
+        ]
+    }
+];
+
 function escapeAttribute(value = '') {
     return String(value)
         .replace(/&/g, '&amp;')
@@ -65,14 +89,54 @@ function getRandomGalleryItem(galleryItems = []) {
     return galleryItems[Math.floor(Math.random() * galleryItems.length)];
 }
 
+function textIncludesBox(value = '') {
+    return String(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes('box');
+}
+
+function slugifyText(value = '') {
+    return String(value)
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+}
+
+function getProjectGallery(project) {
+    if (PROJECT_GALLERIES[project.title]) {
+        return PROJECT_GALLERIES[project.title];
+    }
+
+    const projectSignature = slugifyText([
+        project.title,
+        project.category,
+        project.categoryLabel,
+        project.imageUrl
+    ].filter(Boolean).join(' '));
+    const matchingAlias = PROJECT_GALLERY_ALIASES.find((alias) => (
+        alias.patterns.some((pattern) => projectSignature.includes(pattern))
+    ));
+
+    if (matchingAlias) {
+        return matchingAlias.paths;
+    }
+
+    if (textIncludesBox(project.title) || textIncludesBox(project.category) || textIncludesBox(project.categoryLabel)) {
+        return BOX_PROJECT_GALLERY;
+    }
+
+    return [project.imageUrl];
+}
+
 function getImageButton(imageUrl, altText, extraClass = '', galleryItems = []) {
     const safeImageUrl = escapeAttribute(imageUrl);
     const safeAltText = escapeAttribute(altText);
     const safeGallery = escapeAttribute(JSON.stringify(galleryItems.length ? galleryItems : [{ src: imageUrl, title: altText }]));
+    const safeFallbackImage = escapeAttribute(galleryItems[0]?.src || imageUrl);
 
     return `
         <button class="image-lightbox-trigger ${extraClass}" type="button" data-full-image="${safeImageUrl}" data-image-alt="${safeAltText}" data-gallery="${safeGallery}">
-            <img src="${safeImageUrl}" alt="${safeAltText}" loading="lazy">
+            <img src="${safeImageUrl}" alt="${safeAltText}" loading="lazy" data-fallback-image="${safeFallbackImage}">
         </button>
     `;
 }
@@ -108,7 +172,7 @@ function renderContact() {
 function renderProjects(filter = 'todos') {
     const filtered = filter === 'todos' ? allProjects : allProjects.filter((project) => project.category === filter);
     projectsGrid.innerHTML = filtered.map((project) => {
-        const galleryItems = createGalleryItems(PROJECT_GALLERIES[project.title] || [project.imageUrl], project.title);
+        const galleryItems = createGalleryItems(getProjectGallery(project), project.title);
         const featuredImage = getRandomGalleryItem(galleryItems) || { src: project.imageUrl, title: project.title };
 
         return `
@@ -299,7 +363,7 @@ function setupImageLightbox() {
     }
 
     document.addEventListener('click', (event) => {
-        const trigger = event.target.closest('.image-lightbox-trigger, .front-introduction-image img, .front-distributor-image img');
+        const trigger = event.target.closest('.image-lightbox-trigger, .front-distributor-image img');
         if (!trigger) return;
 
         const image = trigger.tagName === 'IMG' ? trigger : trigger.querySelector('img');
@@ -338,6 +402,19 @@ function setupImageLightbox() {
     });
 }
 
+function setupImageFallbacks() {
+    document.addEventListener('error', (event) => {
+        const image = event.target;
+        if (!(image instanceof HTMLImageElement)) return;
+
+        const fallbackImage = image.dataset.fallbackImage;
+        if (!fallbackImage || image.dataset.fallbackApplied === 'true') return;
+
+        image.dataset.fallbackApplied = 'true';
+        image.src = fallbackImage;
+    }, true);
+}
+
 function setupScrollReveal() {
     const revealItems = [
         ...document.querySelectorAll('.section-title, .front-introduction-text, .front-introduction-image, .front-distributor-image, .front-distributor-content, .contact-info, .contact-card, .process-list article'),
@@ -364,6 +441,7 @@ function setupScrollReveal() {
 
 async function init() {
     await loadNavbar();
+    setupImageFallbacks();
     setupBannerSlider();
     renderServices();
     renderContact();
